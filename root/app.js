@@ -9,9 +9,9 @@ const sequelize = new Sequelize(process.env.DB_NAME, process.env.DB_USER, proces
 host: 'localhost',
 dialect: 'postgres'
 });
-// handlebars
-const exphbs = require('express-handlebars')
-const hbs = exphbs.create({});
+// // handlebars
+// const exphbs = require('express-handlebars')
+// const hbs = exphbs.create({});
 
 app.listen(port, () => {
     console.log(`App Listening to port ${port}`)
@@ -25,9 +25,6 @@ app.listen(port, () => {
     });
 });   
 
-app.engine('handlebars', hbs.engine);
-
-app.set('view engine', 'handlebars');
 app.use(express.static('public'))
 
 app.get("/passwords", (req, res) => {
@@ -42,9 +39,9 @@ app.get("/passwords", (req, res) => {
 
 client.connect();
 
-const login = require('./utils/login'); // Import login function (from login.js)
+const login = require('../utils/login'); // Import login function (from login.js)
 // OR
-const PasswordController = require('./controllers/PasswordController'); // Import controller (from PasswordController.js)
+const PasswordController = require('../controllers/PasswordController'); // Import controller (from PasswordController.js)
 
 // ... other application setup ...
 
