@@ -1,13 +1,29 @@
 //express
-const client = require('./databasepg.js')
 const express = require("express")
 const app = express();
 const port = 3000;
-
+// sequelize
+const { Sequelize } = require('sequelize');
+require('dotenv').config();
+const sequelize = new Sequelize(process.env.DB_NAME, process.env.DB_USER, process.env.DB_PASSWORD, {
+host: 'localhost',
+dialect: 'postgres'
+});
 // handlebars
 const exphbs = require('express-handlebars')
 const hbs = exphbs.create({});
 
+app.listen(port, () => {
+    console.log(`App Listening to port ${port}`)
+    client.query(`Select * from passwords`, (err, res) => {
+    if(!err){
+        console.log(res.rows);
+    } else {
+        console.log(err.message)
+    }
+    client.end;
+    });
+});   
 
 app.engine('handlebars', hbs.engine);
 
@@ -24,16 +40,6 @@ app.get("/passwords", (req, res) => {
     client.end;
 });
 
-app.listen(port, () => {
-    console.log(`App Listening to port ${port}`)
-});   
-
 client.connect();
 
 
-const { Sequelize } = require('sequelize');
-
-const sequelize = new Sequelize(process.env.DB_NAME, process.env.DB_USER, process.env.DB_PASSWORD, {
-host: 'localhost',
-dialect: 'postgres'
-});
