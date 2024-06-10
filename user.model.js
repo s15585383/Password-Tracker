@@ -18,4 +18,12 @@ const Password = sequelize.define('Password', {
     allowNull: false,
   },
 });
+
+// Hook to hash password before saving
+Password.beforeCreate(async (password) => {
+  const salt = await bcrypt.genSalt(10); // Generate a salt with 10 rounds
+  password.hashedPassword = await bcrypt.hash(password.password, salt); // Hash the password with the salt
+  delete password.password; // Remove plain text password after hashing
+});
+
 module.exports = Password;
