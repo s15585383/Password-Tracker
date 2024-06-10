@@ -1,4 +1,4 @@
-const login = require('../utils/login'); // Import login function
+const login = require('./login'); // Import login function
 
 async function main() {
   const isLoggedIn = await login();
