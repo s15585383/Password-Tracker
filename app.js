@@ -42,4 +42,13 @@ app.get("/passwords", (req, res) => {
 
 client.connect();
 
+const login = require('./utils/login'); // Import login function (from login.js)
+// OR
+const PasswordController = require('./controllers/PasswordController'); // Import controller (from PasswordController.js)
 
+// ... other application setup ...
+
+// Start password management functionality
+login(); // Call the login function (from login.js)
+// OR
+PasswordController.main(); // Call the main function from the controller (if using PasswordController.js)
