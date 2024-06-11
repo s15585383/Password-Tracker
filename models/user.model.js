@@ -3,6 +3,7 @@ const bcrypt = require('bcryptjs');
 
 const sequelize = require('./database'); // Assuming your config file
 
+// User Model
 const User = sequelize.define('User', {
   id: {
     type: Sequelize.INTEGER,
@@ -27,4 +28,33 @@ User.beforeCreate(async (user) => {
   delete user.masterPassword; // Remove plain text password after hashing
 });
 
-module.exports = User;
+// Password Model
+const Password = sequelize.define('Password', {
+  id: {
+    type: Sequelize.INTEGER,
+    primaryKey: true,
+    autoIncrement: true,
+  },
+  title: {
+    type: Sequelize.STRING,
+    allowNull: false,
+  },
+  url: {
+    type: Sequelize.STRING,
+  },
+  username: {
+    type: Sequelize.STRING,
+  },
+  userId: {
+    type: Sequelize.INTEGER,
+    references: {
+      model: User, // Reference the User model
+      key: 'id',
+    },
+  },
+});
+
+// Association (Optional, but recommended)
+User.hasMany(Password, { foreignKey: 'userId' }); // A user can have many passwords
+
+module.exports = { User, Password }; // Export both models
