@@ -16,30 +16,27 @@ $(document).ready(function() {
     });
   });
   function populateAccountList(data) {
-    const accountList = $("#your-account-list-container-id"); // Replace with the ID of your account list container element (table, list, etc.)
+    const accountList = $(".account-card"); // Select all elements with class "account-card"
     accountList.empty(); // Clear existing content (optional)
     
     data.forEach(function(account) {
-      const appName = account.appName;
+      const appName = account.title; // Assuming title represents the application name
       const username = account.username;
       
-      // Create HTML element for each account entry
       const accountElement = createAccountElement(appName, username);
-      accountList.append(accountElement);
+      accountList.parent().append(accountElement);
     });
   }
+  
 
 //   This function should take the appName and username as arguments and return the corresponding HTML element representing that account
-  function createAccountElement(appName, username) {
-    const card = $('<div class="card account-card">');
-    const cardBody = $('<div class="card-body">');
-    const cardTitle = $('<h5></h5>').addClass('card-title').text(appName);
-    const cardText = $('<p class="card-text">').text(`Username: ${username}`);
+function createAccountElement(appName, username) {
+    const tableRow = $('<tr>');
+    const appNameCell = $('<td>').text(appName);
+    const usernameCell = $('<td>').text(username);
     
-    cardBody.append(cardTitle, cardText);
-    card.append(cardBody);
-    
-    return card;
+    tableRow.append(appNameCell, usernameCell);
+    return tableRow;
   }
   
   

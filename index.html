@@ -26,7 +26,7 @@
   <div class="container">
     <div class="row">
       <div class="col-md-6">
-        <div class="card account-card">
+        <div class="card account-card" data-password-id="1">
           <div class="card-body">
             <h5 class="card-title">App Name</h5>
             <p class="card-text">Username: some_username</p>
@@ -35,10 +35,10 @@
         </div>
         </div>
       <div class="col-md-6">
-        </div>
+      </div>
     </div>
   </div>
-
+  
   <div class="container">
     <div id="password-info" class="alert alert-info">
       <h4>Login Info for: <span id="selected-account">--</span></h4>
@@ -47,7 +47,7 @@
       <button type="button" class="btn btn-secondary" onclick="clearPasswordInfo()">Clear</button>
     </div>
   </div>
-  
+
   <script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
   <script>
     // JavaScript logic to populate account list, handle clicks, and display password info
