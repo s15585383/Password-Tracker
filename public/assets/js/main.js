@@ -28,5 +28,18 @@ $(document).ready(function() {
       accountList.append(accountElement);
     });
   }
+
+//   This function should take the appName and username as arguments and return the corresponding HTML element representing that account
+  function createAccountElement(appName, username) {
+    const card = $('<div class="card account-card">');
+    const cardBody = $('<div class="card-body">');
+    const cardTitle = $('<h5></h5>').addClass('card-title').text(appName);
+    const cardText = $('<p class="card-text">').text(`Username: ${username}`);
+    
+    cardBody.append(cardTitle, cardText);
+    card.append(cardBody);
+    
+    return card;
+  }
   
   
