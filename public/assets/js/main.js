@@ -16,6 +16,17 @@ $(document).ready(function() {
     });
   });
   function populateAccountList(data) {
-    // Code to parse the JSON data and update the HTML
+    const accountList = $("#your-account-list-container-id"); // Replace with the ID of your account list container element (table, list, etc.)
+    accountList.empty(); // Clear existing content (optional)
+    
+    data.forEach(function(account) {
+      const appName = account.appName;
+      const username = account.username;
+      
+      // Create HTML element for each account entry
+      const accountElement = createAccountElement(appName, username);
+      accountList.append(accountElement);
+    });
   }
+  
   
