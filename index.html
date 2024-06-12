@@ -24,28 +24,37 @@
   </nav>
 
   <div class="container">
-    <div class="row">
-      <div class="col-md-6">
-        <div class="card account-card" data-password-id="1">
-          <div class="card-body">
-            <h5 class="card-title">App Name</h5>
-            <p class="card-text">Username: some_username</p>
-            <a href="#" class="btn btn-primary">Copy Password</a>
-          </div>
-        </div>
-        </div>
+<div class="row">
+  <div class="col-md-6">
+    <div class="card account-card" data-password-id="1">
+      <div class="card-body">
+        <h5 class="card-title">App Name</h5>
+        <p class="card-text">Username: some_username</p>
+        <a href="#" class="btn btn-primary">Copy Password</a>
+      </div>
+    </div>
+  </div>
+  </div>
+
       <div class="col-md-6">
       </div>
     </div>
   </div>
   
   <div class="container">
-    <div id="password-info" class="alert alert-info">
+    <div class="row">
+      </div>
+  
+    <div id="password-info" class="alert alert-info collapse">
       <h4>Login Info for: <span id="selected-account">--</span></h4>
       <p>Username: <span id="username">--</span></p>
       <p>Password: <span id="password">--</span></p>
       <button type="button" class="btn btn-secondary" onclick="clearPasswordInfo()">Clear</button>
     </div>
+  
+    <button type="button" class="btn btn-link" data-bs-toggle="collapse" data-bs-target="#password-info">
+      Show Details
+    </button>
   </div>
 
   <script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>

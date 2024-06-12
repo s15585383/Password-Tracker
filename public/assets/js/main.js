@@ -1,22 +1,30 @@
 $(document).ready(function() {
-    $.ajax({
-      url: "YOUR_API_ENDPOINT_URL", 
-      type: "GET",
-      beforeSend: function(xhr) {
-        // Set authorization header if needed
-        xhr.setRequestHeader("Authorization", `Bearer ${YOUR_JWT_TOKEN}`); // Replace with a way to access the user's JWT token
-      },
-      success: function(data) {
-        populateAccountList(data); // Function to populate the account list with retrieved data
-      },
-      error: function(jqXHR, textStatus, errorThrown) {
-        console.error("Error retrieving passwords:", textStatus, errorThrown);
-        // Handle errors appropriately (e.g., display an error message to the user)
-      }
+    // Fetch initial password data and populate account list
+    fetchPasswordData();
+  
+    // Click event listener for account cards
+    $(".account-card").on("click", function() {
+      const passwordId = $(this).data("passwordId");
+      getPasswordDetails(passwordId);
     });
   });
+  
+  function fetchPasswordData() {
+    $.ajax({
+      url: "/passwords", // Assuming your endpoint for retrieving all passwords
+      method: "GET",
+      success: function(data) {
+        populateAccountList(data);
+      },
+      error: function(error) {
+        console.error("Error retrieving passwords:", error);
+        // Handle errors (e.g., display an error message)
+      }
+    });
+  }
+  
   function populateAccountList(data) {
-    const accountList = $(".account-card"); // Select all elements with class "account-card"
+    const accountList = $(".account-card");
     accountList.empty(); // Clear existing content (optional)
     
     data.forEach(function(account) {
@@ -26,6 +34,30 @@ $(document).ready(function() {
       const accountElement = createAccountElement(appName, username);
       accountList.parent().append(accountElement);
     });
+  }
+  
+  function getPasswordDetails(passwordId) {
+    $.ajax({
+      url: `/passwords/${passwordId}`, // Assuming endpoint for specific password
+      method: "GET",
+      success: function(data) {
+        displayPasswordInfo(data);
+      },
+      error: function(error) {
+        console.error("Error retrieving password details:", error);
+        // Handle errors (e.g., display an error message)
+      }
+    });
+  }
+  
+  function displayPasswordInfo(data) {
+    const username = data.username;
+    const password = data.password; // Assuming password property exists
+    
+    $("#password-info").show(); // Show the password info element
+    $("#selected-account").text(data.title || data.appName); // Update selected account text
+    $("#username").text(username);
+    $("#password").text(password);
   }
   
 
