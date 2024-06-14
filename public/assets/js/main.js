@@ -5,7 +5,21 @@ $(document).ready(function() {
     // Click event listener for account cards
     $(".account-card").on("click", function() {
       const passwordId = $(this).data("passwordId");
-      getPasswordDetails(passwordId);
+      const passwordField = $(this).find(".password-field");
+      const showPasswordBtn = $(this).find(".show-password-btn");
+      const copyPasswordBtn = $(this).find(".copy-password-btn");
+  
+      // Toggle password visibility and button states based on current state
+      togglePasswordVisibility(passwordField, showPasswordBtn, copyPasswordBtn);
+  
+      // Existing logic to retrieve password details if needed (assuming you have this)
+      // getPasswordDetails(passwordId)
+      //   .then(data => {
+      //     // Update password field value (if not pre-populated)
+      //   })
+      //   .catch(error => {
+      //     console.error("Error retrieving password details:", error);
+      //   });
     });
   });
   
@@ -26,11 +40,11 @@ $(document).ready(function() {
   function populateAccountList(data) {
     const accountList = $(".account-card");
     accountList.empty(); // Clear existing content (optional)
-    
+  
     data.forEach(function(account) {
       const appName = account.title; // Assuming title represents the application name
       const username = account.username;
-      
+  
       const accountElement = createAccountElement(appName, username);
       accountList.parent().append(accountElement);
     });
@@ -41,7 +55,7 @@ $(document).ready(function() {
       url: `/passwords/${passwordId}`, // Assuming endpoint for specific password
       method: "GET",
       success: function(data) {
-        displayPasswordInfo(data);
+        displayPasswordInfo(data); // Assuming this function still updates visuals (username might be needed)
       },
       error: function(error) {
         console.error("Error retrieving password details:", error);
@@ -51,24 +65,58 @@ $(document).ready(function() {
   }
   
   function displayPasswordInfo(data) {
-    const username = data.username;
-    const password = data.password; // Assuming password property exists
-    
-    $("#password-info").show(); // Show the password info element
-    $("#selected-account").text(data.title || data.appName); // Update selected account text
-    $("#username").text(username);
-    $("#password").text(password);
+    // Update username or other info in your existing implementation (if needed)
   }
   
-
-//   This function should take the appName and username as arguments and return the corresponding HTML element representing that account
-function createAccountElement(appName, username) {
-    const tableRow = $('<tr>');
-    const appNameCell = $('<td>').text(appName);
-    const usernameCell = $('<td>').text(username);
+  function createAccountElement(appName, username) {
+    // Assuming your existing logic to create the account card element
+    // ... your code for creating the card element with modifications below
+  
+    const passwordField = $('<input type="password" class="form-control password-field" disabled>');
+    const showPasswordBtn = $('<button type="button" class="btn btn-secondary btn-sm show-password-btn">Show Password</button>');
+    const copyPasswordBtn = $('<button type="button" class="btn btn-secondary btn-sm copy-password-btn" disabled>Copy</button>');
+  
+    // Append these elements to your existing account card structure
+    // ... append passwordField, showPasswordBtn, copyPasswordBtn to your card element
     
-    tableRow.append(appNameCell, usernameCell);
-    return tableRow;
+    return accountElement; // Assuming you return the modified card element
   }
   
+  function togglePasswordVisibility(passwordField, showPasswordBtn, copyPasswordBtn) {
+    const isVisible = passwordField.attr("type") === "text"; // Check if password is currently visible
+  
+    if (isVisible) {
+      passwordField.attr("type", "password"); // Hide password
+      showPasswordBtn.text("Show Password");
+      copyPasswordBtn.disabled = true; // Disable copy button
+    } else {
+      passwordField.attr("type", "text"); // Show password
+      showPasswordBtn.text("Hide Password");
+      copyPasswordBtn.disabled = false; // Enable copy button
+    }
+  }
+  
+  // Remember to include and configure the clipboard.js library for secure clipboard access
+  
+  $(document).ready(function() {
+    // ... rest of the code ...
+  
+    $(document).ready(function() {
+      // Add event listener for copy button click
+      $(".copy-password-btn").on("click", function() {
+        const passwordField = $(this).closest(".account-card").find(".password-field");
+        const password = passwordField.val();
+  
+        // Use clipboard.js for secure clipboard access
+        navigator.clipboard.writeText(password)
+          .then(() => {
+            console.log("Password copied to clipboard");
+          })
+          .catch(err => {
+            console.error("Error copying password:", err);
+            // Handle potential errors (e.g., clipboard permissions)
+          });
+      });
+    });
+  });
   

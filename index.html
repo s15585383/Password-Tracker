@@ -27,12 +27,15 @@
 <div class="row">
   <div class="col-md-6">
     <div class="card account-card" data-password-id="1">
-      <div class="card-body">
-        <h5 class="card-title">App Name</h5>
-        <p class="card-text">Username: some_username</p>
-        <a href="#" class="btn btn-primary">Copy Password</a>
+        <div class="card-body">
+          <h5 class="card-title">App Name</h5>
+          <p class="card-text">Username: some_username</p>
+          <input type="password" class="form-control password-field" disabled> <button type="button" class="btn btn-secondary btn-sm show-password-btn">Show Password</button>
+          <button type="button" class="btn btn-secondary btn-sm copy-password-btn" disabled>Copy</button>
+        </div>
       </div>
-    </div>
+      
+
   </div>
   </div>
 
@@ -52,11 +55,6 @@
       <button type="button" class="btn btn-secondary" onclick="clearPasswordInfo()">Clear</button>
     </div>
   
-    <button type="button" class="btn btn-link" data-bs-toggle="collapse" data-bs-target="#password-info">
-      Show Details
-    </button>
-  </div>
-
   <script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
   <script>
     // JavaScript logic to populate account list, handle clicks, and display password info
