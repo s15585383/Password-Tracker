@@ -12,19 +12,22 @@ const User = sequelize.define('User', {
   },
   username: {
     type: Sequelize.STRING,
-    allowNull: false,
-    unique: true,
+    allowNull: true, // Username might be optional
   },
-  hashedMasterPassword: {
+  passwordHash: {
     type: Sequelize.STRING,
     allowNull: false,
+  },
+  masterPassword: { // Include the field for user input (optional)
+    type: Sequelize.STRING,
+    allowNull: true,
   },
 });
 
 // Hook to hash password before saving (if creating a new user)
 User.beforeCreate(async (user) => {
   const salt = await bcrypt.genSalt(10);
-  user.hashedMasterPassword = await bcrypt.hash(user.masterPassword, salt);
+  user.passwordHash = await bcrypt.hash(user.masterPassword, salt);
   delete user.masterPassword; // Remove plain text password after hashing
 });
 

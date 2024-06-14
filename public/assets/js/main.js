@@ -83,18 +83,19 @@ $(document).ready(function() {
   }
   
   function togglePasswordVisibility(passwordField, showPasswordBtn, copyPasswordBtn) {
-    const isVisible = passwordField.attr("type") === "text"; // Check if password is currently visible
+    const isVisible = passwordField.attr("type") === "text";
   
     if (isVisible) {
-      passwordField.attr("type", "password"); // Hide password
-      showPasswordBtn.text("Show Password");
-      copyPasswordBtn.disabled = true; // Disable copy button
+      passwordField.attr("type", "password");
+      showPasswordBtn.find("i").removeClass("fa-eye-slash").addClass("fa-eye"); // Update icon class
+      copyPasswordBtn.disabled = true;
     } else {
-      passwordField.attr("type", "text"); // Show password
-      showPasswordBtn.text("Hide Password");
-      copyPasswordBtn.disabled = false; // Enable copy button
+      passwordField.attr("type", "text");
+      showPasswordBtn.find("i").removeClass("fa-eye").addClass("fa-eye-slash"); // Update icon class
+      copyPasswordBtn.disabled = false;
     }
   }
+  
   
   // Remember to include and configure the clipboard.js library for secure clipboard access
   
