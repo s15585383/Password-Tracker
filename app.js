@@ -174,37 +174,34 @@ app.post('/passwords', async (req, res) => {
 
 
 // Protected route for updating a password (PUT)
-app.put('/passwords/:id', verifyJwtToken, async (req, res) => {
+app.put('/passwords/:id', authorizeUser, async (req, res) => {
   try {
-    // Extract password ID from route parameter
     const passwordId = req.params.id;
+    const { title, username, password } = req.body; // Updated details (optional)
 
-    // Extract update data from request body (optional)
-    const { title, url, username } = req.body;
+    const existingPassword = await Password.findByPk(passwordId);
 
-    // Find the password to update
-    const password = await Password.findByPk(passwordId);
-
-    // Check if password exists
-    if (!password) {
+    if (!existingPassword) {
       return res.status(404).send("Password not found");
     }
 
-    // Verify user authorization (password belongs to the user)
-    if (password.userId !== req.user.id) {
-      return res.status(401).send("Unauthorized: You cannot modify this password");
-    }
+    const updatedData = {}; // Object to store updated fields
 
-    // Update the password data
-    await password.update({ title, url, username });
+    if (title) updatedData.title = title;
+    if (username) updatedData.username = username;
+    if (password) updatedData.password = await bcrypt.hash(password, 10);
 
-    // Send success message or the updated password object
-    res.json({ message: "Password updated successfully", password });
+    await existingPassword.update(updatedData);
+
+    const updatedPassword = await Password.findByPk(passwordId); // Fetch updated entry
+
+    res.json({ message: "Password updated successfully", updatedPassword });
   } catch (error) {
     console.error(error);
     res.status(500).send("Internal Server Error");
   }
 });
+
 
 // Protected route for deleting a password (DELETE)
 app.delete('/passwords/:id', verifyJwtToken, async (req, res) => {
