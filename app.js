@@ -88,6 +88,23 @@ app.post('/register', async (req, res) => {
   }
 });
 
+app.post('/login', async (req, res) => {
+  try {
+    const { username, password } = req.body;
+
+    const user = await User.findOne({ where: { username } });
+
+    if (!user || !(await bcrypt.compare(password, user.passwordHash))) {
+      return res.status(401).send("Login failed"); // Generic message
+    }
+
+    // ... successful login processing (generate JWT token, etc.) ...
+  } catch (error) {
+    console.error(error);
+    res.status(500).send("Internal Server Error");
+  }
+});
+
 
 // Protected route for creating a password (POST)
 app.post('/passwords', verifyJwtToken, async (req, res) => {
