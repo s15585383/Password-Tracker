@@ -81,4 +81,4 @@ User.hasMany(Password, { foreignKey: 'userId' }); // A user can have many passwo
   }
 })();
 
-module.exports = { User, Password }; // Export both models
+module.exports = { User, Password, sequelize }; // Export both models

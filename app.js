@@ -1,4 +1,5 @@
 const express = require('express');
+const { User, Password } = require('./user.model.js'); // Assuming user.model.js location
 const loginRouter = require('./controllers/login'); // Assuming controllers folder
 const cors = require('cors'); // Optional, for allowing cross-origin requests
 const jwt = require('jsonwebtoken'); // Require jsonwebtoken library
