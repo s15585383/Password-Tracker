@@ -2,7 +2,8 @@ const express = require('express');
 const { User, Password } = require('./user.model.js'); // Assuming user.model.js location
 const loginRouter = require('./controllers/login'); // Assuming controllers folder
 const cors = require('cors'); // Optional, for allowing cross-origin requests
-const jwt = require('jsonwebtoken'); // Require jsonwebtoken library
+const jwt = require('jsonwebtoken');
+const bcrypt = require('bcryptjs'); // Include bcrypt for password hashing
 
 // ... other imports (Sequelize, etc.)
 
@@ -41,7 +42,21 @@ function verifyJwtToken(req, res, next) {
   });
 }
 
-// Protected route example (requires JWT authorization before access)
+// User registration route
+app.post('/register', async (req, res) => {
+  const { username, password } = req.body; // Use the correct field name from your model
+  try {
+    // Hash the password before storing
+    const hashedPassword = await bcrypt.hash(password, 10);
+    const newUser = await User.create({ username, hashedPassword });
+    res.json({ message: 'User created successfully!', user: newUser });
+  } catch (error) {
+    console.error('Error creating user:', error);
+    res.status(500).json({ message: 'Error creating user' });
+  }
+});
+
+// Protected routes (require JWT authorization)
 app.get('/passwords', verifyJwtToken, async (req, res) => {
   try {
     // Extract user ID from decoded JWT token
@@ -57,6 +72,22 @@ app.get('/passwords', verifyJwtToken, async (req, res) => {
     res.status(500).send("Internal Server Error");
   }
 });
+
+
+
+// Assuming 'User' model is imported from user.model.js
+
+app.post('/register', async (req, res) => {
+  const { username, masterPassword } = req.body;
+  try {
+    const newUser = await User.create({ username, masterPassword }); // Hash password before storing
+    res.json({ message: 'User created successfully!', user: newUser });
+  } catch (error) {
+    console.error('Error creating user:', error);
+    res.status(500).json({ message: 'Error creating user' });
+  }
+});
+
 
 // Protected route for creating a password (POST)
 app.post('/passwords', verifyJwtToken, async (req, res) => {
