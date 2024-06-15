@@ -30,6 +30,29 @@ const User = sequelize.define('User', {
   },
 });
 
+//password model
+const Password = sequelize.define('Password', {
+  title: {
+    type: Sequelize.STRING,
+    allowNull: false,
+  },
+  username: {
+    type: Sequelize.STRING,
+  }, // Optional: duplicate for display purposes
+  password: {
+    type: Sequelize.STRING,
+    allowNull: false,
+  }, // Store hashed password
+  userId: {
+    type: Sequelize.INTEGER,
+    references: {
+      model: User,
+      key: 'id',
+    },
+  },
+});
+
+
 // Hook to hash password before saving (if creating a new user)
 User.beforeCreate(async (user) => {
   if (user.masterPassword) { // Not recommended for user input anymore
@@ -93,4 +116,4 @@ async function loginUser(userInput) {
   }
 })();
 
-module.exports = { User, sequelize }; // Export the User model and Sequelize instance
+module.exports = { User, Password, sequelize }; // Export the User model, password and Sequelize instance

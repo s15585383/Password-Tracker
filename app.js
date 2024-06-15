@@ -43,30 +43,79 @@ function verifyJwtToken(req, res, next) {
 }
 
 // User registration route
-app.post('/register', async (req, res) => {
-  const { username, password } = req.body; // Use the correct field name from your model
+const User = require('./models/User'); // Import User model
+const bcrypt = require('bcrypt');
+
+// ... other imports and existing routes ...
+const authorizeUser = async (req, res, next) => {
   try {
-    // Hash the password before storing
-    const hashedPassword = await bcrypt.hash(password, 10);
-    const newUser = await User.create({ username, hashedPassword });
-    res.json({ message: 'User created successfully!', user: newUser });
+    const passwordId = req.params.id; // Extract password ID from request params (if applicable)
+    const userId = req.user.id; // Assuming user ID is stored in req.user
+
+    // Check if password entry exists and belongs to the logged-in user
+    const password = await Password.findByPk(passwordId, {
+      include: [{
+        model: User,
+        where: { id: userId }, // Filter by logged-in user
+      }],
+    });
+
+    if (!password) {
+      return res.status(401).send("Unauthorized: Access denied");
+    }
+
+    next(); // Continue to the route handler if authorized
   } catch (error) {
-    console.error('Error creating user:', error);
-    res.status(500).json({ message: 'Error creating user' });
+    console.error(error);
+    res.status(500).send("Internal Server Error");
+  }
+};
+
+app.post('/register', async (req, res) => {
+  try {
+    const { username, password } = req.body;
+
+    // Hash the password
+    const hashedPassword = await bcrypt.hash(password, 10); // Adjust salt rounds as needed
+
+    // Create a new user
+    const user = await User.create({ username, passwordHash: hashedPassword });
+
+    //generate JWT token on signup
+
+    res.status(201).json({ message: "User created successfully" });
+
+  } catch (error) {
+    console.error(error);
+    res.status(500).send("Internal Server Error");
   }
 });
 
+
 // Protected routes (require JWT authorization)
-app.get('/passwords', verifyJwtToken, async (req, res) => {
+app.get('/passwords', authorizeUser, async (req, res) => {
   try {
-    // Extract user ID from decoded JWT token
     const userId = req.user.id;
 
-    // Find all passwords associated with the user ID
     const passwords = await Password.findAll({ where: { userId } });
 
-    // Send retrieved passwords in the response
     res.json(passwords);
+  } catch (error) {
+    console.error(error);
+    res.status(500).send("Internal Server Error");
+  }
+});
+app.get('/passwords/:id', authorizeUser, async (req, res) => {
+  try {
+    const passwordId = req.params.id;
+
+    const password = await Password.findByPk(passwordId); // Fetch specific entry
+
+    if (!password) {
+      return res.status(404).send("Password not found"); // Handle non-existent entry
+    }
+
+    res.json(password);
   } catch (error) {
     console.error(error);
     res.status(500).send("Internal Server Error");
@@ -107,30 +156,22 @@ app.post('/login', async (req, res) => {
 
 
 // Protected route for creating a password (POST)
-app.post('/passwords', verifyJwtToken, async (req, res) => {
+app.post('/passwords', async (req, res) => {
   try {
-    // Extract password data from request body
-    const { title, url, username } = req.body;
+    const { title, username, password } = req.body;
+    const userId = req.user.id; // Assuming user ID is stored in req.user
 
-    // Extract user ID from decoded JWT token
-    const userId = req.user.id;
+    const hashedPassword = await bcrypt.hash(password, 10); // Hash the password
 
-    // Create a new password entry with user association
-    const newPassword = await Password.create({ title, url, username, userId });
+    const newPassword = await Password.create({ title, username, password: hashedPassword, userId });
 
-    // Send success message or the created password object
-    res.json({ message: "Password created successfully", password: newPassword });
+    res.status(201).json({ message: "Password created successfully", newPassword });
   } catch (error) {
     console.error(error);
-
-    // Handle potential errors (e.g., validation errors)
-    if (error.name === 'SequelizeValidationError') {
-      res.status(400).send("Bad Request: " + error.message);
-    } else {
-      res.status(500).send("Internal Server Error");
-    }
+    res.status(500).send("Internal Server Error");
   }
 });
+
 
 // Protected route for updating a password (PUT)
 app.put('/passwords/:id', verifyJwtToken, async (req, res) => {
@@ -212,4 +253,4 @@ async function getPasswordsByUserId(userId) {
     console.error(error);
     throw error; // Re-throw the error for handling in the route
   }
-}
+};
