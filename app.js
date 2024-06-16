@@ -4,9 +4,6 @@ const loginRouter = require('./controllers/login'); // Assuming controllers fold
 const cors = require('cors'); // Optional, for allowing cross-origin requests
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs'); // Include bcrypt for password hashing
-
-// ... other imports (Sequelize, etc.)
-
 const app = express();
 const port = process.env.PORT || 3000; // Use environment variable for port
 
@@ -89,6 +86,15 @@ app.post('/register', async (req, res) => {
   }
 });
 
+// Serve the login page (adjust path as needed)
+app.get('/login', (req, res) => {
+  res.sendFile('login.html', { root: 'public' }); // Assuming login.html is in the 'public' directory
+});
+
+
+app.listen(port, () => {
+  console.log(`Server listening on port ${port}`);
+});
 
 // Protected routes (require JWT authorization)
 app.get('/passwords', authorizeUser, async (req, res) => {
@@ -135,20 +141,26 @@ app.post('/register', async (req, res) => {
   }
 });
 
+// Login route handler
 app.post('/login', async (req, res) => {
   try {
     const { username, password } = req.body;
 
+    // Find the user by username
     const user = await User.findOne({ where: { username } });
 
+    // Check if user exists and validate password
     if (!user || !(await bcrypt.compare(password, user.passwordHash))) {
-      return res.status(401).send("Login failed"); // Generic message
+      return res.status(401).json({ message: "Login failed: Incorrect username or password" });
     }
 
-    // ... successful login processing (generate JWT token, etc.) ...
+    // Generate JWT token on successful login
+    const token = jwt.sign({ userId: user.id }, process.env.JWT_SECRET, { expiresIn: '30m' }); // Adjust expiration time as needed
+
+    res.json({ message: "Login successful", token });
   } catch (error) {
     console.error(error);
-    res.status(500).send("Internal Server Error");
+    res.status(500).json({ message: "Internal Server Error" });
   }
 });
 

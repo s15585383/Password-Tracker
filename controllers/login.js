@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router(); // Use a separate router for login
 const bcrypt = require('bcryptjs'); // For password hashing
 const User = require('../models/User'); // Assuming your User model is in models folder
+const jwt = require('jsonwebtoken'); // For JWT generation
 
 // ... other imports and setup (if needed)
 
@@ -12,28 +13,29 @@ router.post('/login', async (req, res) => {
     // Find user by username using Sequelize model
     const user = await User.findOne({ where: { username } });
     if (!user) {
-      return res.status(401).send("Invalid username or password"); // Unauthorized
+      return res.status(401).json({ message: "Username not found" }); // Unauthorized (more specific message)
     }
 
     // Verify password using bcrypt.compare (assuming hashed password in user.password)
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
-      return res.status(401).send("Invalid username or password"); // Unauthorized
+      return res.status(401).json({ message: "Incorrect password" }); // Unauthorized (more specific message)
     }
 
-    // Login successful, generate a JWT token (we'll cover JWT in the next step)
+    // Login successful, generate a JWT token
     const token = generateJwtToken(user.id); // Replace with JWT generation logic
 
-    res.json({ token }); // Send the generated token in the response
+    res.json({ message: "Login successful", token, userId: user.id }); // More informative response
   } catch (error) {
     console.error(error);
-    res.status(500).send("Internal Server Error"); // Handle errors gracefully
+    res.status(500).json({ message: "Internal Server Error" }); // Handle errors gracefully
   }
 });
 
-// Implement JWT generation function (replace with your logic)
+// Implement JWT generation function using jsonwebtoken library
 function generateJwtToken(userId) {
-  // ... JWT generation logic using jsonwebtoken library (refer to previous steps)
+  // ... JWT generation logic with process.env.JWT_SECRET and expiration time
+  // Refer to previous steps for guidance on using jsonwebtoken
 }
 
 module.exports = router; // Export the router for use in app.js
