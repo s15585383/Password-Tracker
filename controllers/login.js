@@ -6,29 +6,42 @@ const jwt = require('jsonwebtoken'); // For JWT generation
 
 // ... other imports and setup (if needed)
 
-router.post('/login', async (req, res) => {
+router.post('/register', async (req, res) => {
   try {
-    const { username, password } = req.body; // Get username and password from request body
+    const { username, email, password } = req.body;
 
-    // Find user by username using Sequelize model
-    const user = await User.findOne({ where: { username } });
-    if (!user) {
-      return res.status(401).json({ message: "Username not found" }); // Unauthorized (more specific message)
+    // Check for existing user with username or email (if storing email)
+    const existingUser = await User.findOne({
+      where: { username: username }, // Check for username conflict
+    });
+    if (existingUser) {
+      return res.status(400).json({ message: "Username already exists" });
     }
 
-    // Verify password using bcrypt.compare (assuming hashed password in user.password)
-    const isMatch = await bcrypt.compare(password, user.password);
-    if (!isMatch) {
-      return res.status(401).json({ message: "Incorrect password" }); // Unauthorized (more specific message)
+    if (email) { // Check for email conflict if storing email
+      const existingEmail = await User.findOne({ where: { email: email } });
+      if (existingEmail) {
+        return res.status(400).json({ message: "Email already exists" });
+      }
     }
 
-    // Login successful, generate a JWT token
+    // Hash password before saving
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    // Create a new user with hashed password and email (if applicable)
+    const user = await User.create({
+      username,
+      email, // Add email field if storing email
+      password: hashedPassword,
+    });
+
+    // Registration successful, generate a JWT token
     const token = generateJwtToken(user.id); // Replace with JWT generation logic
 
-    res.json({ message: "Login successful", token, userId: user.id }); // More informative response
+    res.json({ message: "Registration successful", token, userId: user.id });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: "Internal Server Error" }); // Handle errors gracefully
+    res.status(500).json({ message: "Internal Server Error" });
   }
 });
 
