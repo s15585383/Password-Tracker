@@ -34,8 +34,14 @@ router.post('/login', async (req, res) => {
 
 // Implement JWT generation function using jsonwebtoken library
 function generateJwtToken(userId) {
-  // ... JWT generation logic with process.env.JWT_SECRET and expiration time
-  // Refer to previous steps for guidance on using jsonwebtoken
+  const payload = { userId }; // Payload containing the user ID
+  const secret = process.env.JWT_SECRET; // Access the secret key from environment variable
+  const options = {
+    expiresIn: '30m', // Set expiration time for the token (e.g., 30 minutes)
+  };
+
+  return jwt.sign(payload, secret, options);
 }
+
 
 module.exports = router; // Export the router for use in app.js
