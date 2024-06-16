@@ -28,6 +28,11 @@ const User = sequelize.define('User', {
     type: Sequelize.STRING,
     allowNull: false,
   },
+    email: {
+      type: Sequelize.STRING,
+      allowNull: false, // Make email mandatory
+      unique: true, // Ensure unique email addresses
+  },
 });
 
 //password model
@@ -74,15 +79,16 @@ const userInput = {
 
 // Registration Example (using separate user input)
 async function registerUser(userInput) {
-  const hashedPassword = await bcrypt.hash(userInput.password, 10); // Hash the password
+  const hashedPassword = await bcrypt.hash(userInput.password, 10);
 
-  // Create a User instance with the hashed password
+  // Create a User instance with email and hashed password
   const user = await User.create({
     username: userInput.username,
     passwordHash: hashedPassword,
+    email: userInput.email, 
   });
-
-  // ... handle successful registration (e.g., return user object, send confirmation email)
+  console.log('User registered successfully:', user);
+  return user;
 }
 
 // Login Example (Optional)
@@ -105,7 +111,7 @@ async function loginUser(userInput) {
   return { success: true, user: user }; // Return user object or relevant information
 }
 
-// Test connection (Optional)
+// Test connection
 (async () => {
   try {
     await sequelize.authenticate();

@@ -1,11 +1,14 @@
 const express = require('express');
-const { User, Password } = require('./user.js');
+const { User, Password } = require('./models/user.js');
 const loginRouter = require('./controllers/login'); // Assuming controllers folder
 const cors = require('cors'); // Optional, for allowing cross-origin requests
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs'); // Include bcrypt for password hashing
 const app = express();
 const port = process.env.PORT || 3000; // Use environment variable for port
+
+app.use(express.static('public')); // Add this line to serve static files from public folder
+app.use(express.static('controllers')); // Serve static files from controllers folder
 
 // Enable CORS if needed for cross-origin requests (adjust origins as needed)
 app.use(cors({ origin: 'http://localhost:3001' })); // Assuming frontend on 3001
