@@ -1,7 +1,7 @@
 const express = require('express');
 const { User, Password } = require('./models/user.js');
-const loginRouter = require('./controllers/login'); // Assuming controllers folder
-const cors = require('cors'); // Optional, for allowing cross-origin requests
+const loginRouter = require('./controllers/login'); 
+const cors = require('cors'); //for allowing cross-origin requests
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs'); // Include bcrypt for password hashing
 const app = express();
