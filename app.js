@@ -1,5 +1,5 @@
 const express = require('express');
-const { User, Password } = require('./user.model.js'); // Assuming user.model.js location
+const { User, Password } = require('./user.js');
 const loginRouter = require('./controllers/login'); // Assuming controllers folder
 const cors = require('cors'); // Optional, for allowing cross-origin requests
 const jwt = require('jsonwebtoken');
@@ -126,9 +126,6 @@ app.get('/passwords/:id', authorizeUser, async (req, res) => {
   }
 });
 
-
-
-// Assuming 'User' model is imported from user.model.js
 
 app.post('/register', async (req, res) => {
   const { username, masterPassword } = req.body;
