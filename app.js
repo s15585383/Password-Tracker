@@ -43,8 +43,6 @@ function verifyJwtToken(req, res, next) {
 }
 
 // User registration route
-// const User = require('./models/User'); // Import User model
-const bcrypt = require('bcrypt');
 
 // ... other imports and existing routes ...
 const authorizeUser = async (req, res, next) => {
