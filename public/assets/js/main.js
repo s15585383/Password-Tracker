@@ -13,15 +13,15 @@ $(document).ready(function() {
       return;
     }
 
-    // Handle card selection logic here (e.g., highlight the selected card)
-    $(this).addClass("selected").siblings().removeClass("selected"); // Assuming you want visual selection
+    // Handle card selection logic here 
+    $(this).addClass("selected").siblings().removeClass("selected"); 
   });
 
   // Edit Button Click Event
   $(".edit-password-btn").on("click", function() {
     const passwordId = $(this).closest(".account-card").data("passwordId");
 
-    // Open an edit form modal (assuming you have the structure defined)
+    // Open an edit form modal 
     $("#editPasswordModal").modal("show");
 
     // Assuming your modal has fields for editing website name, username, and password
@@ -31,11 +31,11 @@ $(document).ready(function() {
       success: function(data) {
         $("#editAppName").val(data.title);
         $("#editUsername").val(data.username);
-        $("#editPassword").val(""); // Clear password field (optional)
+        $("#editPassword").val(""); // Clear password field 
       },
       error: function(error) {
         console.error("Error retrieving password details:", error);
-        // Handle errors (e.g., display an error message to the user)
+        // Handle errors 
       }
     });
   });
@@ -44,12 +44,12 @@ $(document).ready(function() {
   $("#editForm").submit(function(event) {
     event.preventDefault(); // Prevent default form submission
 
-    const passwordId = $("#editPasswordId").val(); // Assuming a hidden field stores the password ID
+    const passwordId = $("#editPasswordId").val(); 
     const appName = $("#editAppName").val();
     const username = $("#editUsername").val();
     const password = $("#editPassword").val(); // User-provided new password
 
-    // Hash the password before sending (using bcrypt.js)
+    // Hash the password before sending 
     bcrypt.genSalt(10, (err, salt) => {
       bcrypt.hash(password, salt, (err, hash) => {
         const editedData = {
@@ -65,13 +65,13 @@ $(document).ready(function() {
           contentType: "application/json; charset=utf-8",
           success: function(data) {
             console.log("Password updated successfully!");
-            // Update the account card details (assuming you have a function to do this)
+            // Update the account card details 
             updateAccountCard(passwordId, data);
             $("#editPasswordModal").modal("hide"); // Close the edit modal
           },
           error: function(error) {
             console.error("Error updating password:", error);
-            // Handle errors (e.g., display an error message to the user)
+            // Handle errors 
           }
         });
       });
@@ -99,7 +99,7 @@ $(document).ready(function() {
       },
       error: function(error) {
         console.error("Error deleting password:", error);
-        // Handle errors (e.g., display an error message to the user)
+        // Handle errors 
       }
     });
   });
@@ -168,7 +168,7 @@ $(document).ready(function() {
         })
         .catch(err => {
           console.error("Error copying password:", err);
-          // Handle potential errors (e.g., clipboard permissions)
+          // Handle potential errors 
         });
     });
 
@@ -181,7 +181,7 @@ $(document).ready(function() {
 
     if (isVisible) {
       passwordField.attr("type", "password");
-      showPasswordBtn.find("i").removeClass("fa-eye-slash").addClass("fa-eye"); // Update icon class (assuming Font Awesome)
+      showPasswordBtn.find("i").removeClass("fa-eye-slash").addClass("fa-eye"); // Update icon class 
       copyPasswordBtn.disabled = true;
     } else {
       passwordField.attr("type", "text");
@@ -190,19 +190,16 @@ $(document).ready(function() {
     }
   }
 
-// Function to update account card details after edits (assuming you have logic to update data)
+// Function to update account card details after edits 
 function updateAccountCard(passwordId, updatedData) {
   // Find the account card element with the matching ID
   const accountCard = $(`.account-card[data-password-id="${passwordId}"]`);
 
-  // Update the card content with new data (e.g., title, username)
+  // Update the card content with new data 
   accountCard.find(".card-title").text(updatedData.title);
   accountCard.find(".card-text p:first-child").text(`Username: ${updatedData.username}`);
 
-  // Optionally, update the password field content (if displayed differently after edit)
-  // ... (your logic here)
-
-  // Consider visual feedback (optional)
+  // Consider visual feedback 
   accountCard.addClass("updated").delay(1000).removeClass("updated"); // Briefly highlight the updated card
 }
 
