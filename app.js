@@ -7,11 +7,11 @@ const bcrypt = require('bcryptjs'); // Include bcrypt for password hashing
 const app = express();
 const port = process.env.PORT || 3000; // Use environment variable for port
 
-app.use(express.static('public')); // Add this line to serve static files from public folder
-app.use(express.static('controllers')); // Serve static files from controllers folder
+app.use(express.static('public')); 
+app.use(express.static('controllers')); 
 
 // Enable CORS if needed for cross-origin requests (adjust origins as needed)
-app.use(cors({ origin: 'http://localhost:3001' })); // Assuming frontend on 3001
+app.use(cors({ origin: 'http://localhost:3001' })); 
 
 // Parse incoming JSON data
 app.use(express.json());
@@ -36,7 +36,7 @@ function verifyJwtToken(req, res, next) {
       return res.status(401).send("Unauthorized: Invalid token");
     }
 
-    // Token is valid, attach decoded user data to the request object (optional)
+    // Token is valid, attach decoded user data to the request object 
     req.user = decoded;
     next(); // Proceed with the request if token is valid
   });
@@ -44,11 +44,11 @@ function verifyJwtToken(req, res, next) {
 
 // User registration route
 
-// ... other imports and existing routes ...
+
 const authorizeUser = async (req, res, next) => {
   try {
-    const passwordId = req.params.id; // Extract password ID from request params (if applicable)
-    const userId = req.user.id; // Assuming user ID is stored in req.user
+    const passwordId = req.params.id; // Extract password ID from request params
+    const userId = req.user.id; 
 
     // Check if password entry exists and belongs to the logged-in user
     const password = await Password.findByPk(passwordId, {
@@ -89,9 +89,9 @@ app.post('/register', async (req, res) => {
   }
 });
 
-// Serve the login page (adjust path as needed)
+// Serve the login page 
 app.get('/login', (req, res) => {
-  res.sendFile('login.html', { root: 'public' }); // Assuming login.html is in the 'public' directory
+  res.sendFile('login.html', { root: 'public' }); 
 });
 
 
@@ -99,7 +99,7 @@ app.listen(port, () => {
   console.log(`Server listening on port ${port}`);
 });
 
-// Protected routes (require JWT authorization)
+// Protected routes 
 app.get('/passwords', authorizeUser, async (req, res) => {
   try {
     const userId = req.user.id;
@@ -187,7 +187,7 @@ app.post('/passwords', async (req, res) => {
 app.put('/passwords/:id', authorizeUser, async (req, res) => {
   try {
     const passwordId = req.params.id;
-    const { title, username, password } = req.body; // Updated details (optional)
+    const { title, username, password } = req.body;
 
     const existingPassword = await Password.findByPk(passwordId);
 
@@ -243,15 +243,15 @@ app.delete('/passwords/:id', verifyJwtToken, async (req, res) => {
   }
 });
 
-// ... other routes (consider adding more for password management)
-
+// ... other routes 
+//
 app.listen(port, () => {
   console.log(`Server listening on port ${port}`);
 });
 
 async function getPasswordsByUserId(userId) {
   try {
-    // Use Sequelize to find passwords associated with the user ID
+    // find passwords associated with the user ID
     const passwords = await Password.findAll({
       where: { userId }, // Find passwords where userId matches
     });

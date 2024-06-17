@@ -6,7 +6,7 @@ dotenv.config(); // Load environment variables
 
 // Sequelize Connection Details
 const sequelize = new Sequelize({
-  dialect: 'postgres', // Replace with your database dialect (e.g., 'mysql')
+  dialect: 'postgres', 
   host: process.env.DB_HOST,
   username: process.env.DB_USER,
   password: process.env.DB_PASSWORD,
@@ -43,7 +43,7 @@ const Password = sequelize.define('Password', {
   },
   username: {
     type: Sequelize.STRING,
-  }, // Optional: duplicate for display purposes
+  }, //  duplicate for display purposes
   password: {
     type: Sequelize.STRING,
     allowNull: false,
@@ -75,7 +75,9 @@ User.beforeCreate(async (user) => {
 const userInput = {
   username: '', // User-provided username
   password: '', // User-provided password (plain text)
+  email: '',  // User-provided email address
 };
+
 
 // Registration Example (using separate user input)
 async function registerUser(userInput) {
@@ -85,11 +87,12 @@ async function registerUser(userInput) {
   const user = await User.create({
     username: userInput.username,
     passwordHash: hashedPassword,
-    email: userInput.email, 
+    email: userInput.email, // Include email here
   });
   console.log('User registered successfully:', user);
   return user;
 }
+
 
 // Login Example (Optional)
 async function loginUser(userInput) {
@@ -109,6 +112,24 @@ async function loginUser(userInput) {
 
   // Login successful (replace with your login logic)
   return { success: true, user: user }; // Return user object or relevant information
+}
+
+// Edit Password Functionality
+async function editPassword(passwordId, editedData) {
+  // Assuming editedData contains title, username, and password (hashed)
+  try {
+    const password = await Password.findByPk(passwordId);
+
+    if (!password) {
+      throw new Error('Password not found'); // Handle non-existent password
+    }
+
+    await password.update(editedData);
+    console.log('Password updated successfully:', password);
+  } catch (error) {
+    console.error('Error editing password:', error);
+    // Handle errors (e.g., display an error message to the user)
+  }
 }
 
 // Test connection

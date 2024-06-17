@@ -18,8 +18,8 @@ registerForm.addEventListener('submit', async (event) => {
     const errorData = await response.json();
     errorMessageEl.textContent = errorData.message || "Registration failed"; // Display error message or generic message
   } else {
-    // Handle successful registration (e.g., redirect to login page)
+    // Handle successful registration 
     console.log("Registration successful!");
-    // You might redirect the user to the login page or display a success message
+    // redirect the user to the login page or display a success message
   }
 });

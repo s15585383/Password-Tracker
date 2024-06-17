@@ -10,7 +10,7 @@ router.post('/register', async (req, res) => {
   try {
     const { username, email, password } = req.body;
 
-    // Check for existing user with username or email (if storing email)
+    // Check for existing user with username or email 
     const existingUser = await User.findOne({
       where: { username: username }, // Check for username conflict
     });
@@ -28,10 +28,10 @@ router.post('/register', async (req, res) => {
     // Hash password before saving
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    // Create a new user with hashed password and email (if applicable)
+    // Create a new user with hashed password and email 
     const user = await User.create({
       username,
-      email, // Add email field if storing email
+      email, 
       password: hashedPassword,
     });
 
@@ -45,12 +45,12 @@ router.post('/register', async (req, res) => {
   }
 });
 
-// Implement JWT generation function using jsonwebtoken library
+// Implement JWT generation function 
 function generateJwtToken(userId) {
   const payload = { userId }; // Payload containing the user ID
   const secret = process.env.JWT_SECRET; // Access the secret key from environment variable
   const options = {
-    expiresIn: '30m', // Set expiration time for the token (e.g., 30 minutes)
+    expiresIn: '30m', // Set expiration time for the token (30 minutes)
   };
 
   return jwt.sign(payload, secret, options);
