@@ -3,39 +3,53 @@ $(document).ready(function() {
   // Fetch initial password data and populate account list
   fetchPasswordData();
 
+  // Click event listener for account cards
+  $(".account-card").on("click", function(event) {
+    // Prevent clicks on child elements from bubbling up and triggering card selection
+    if (event.target.classList.contains("show-password-btn") || 
+        event.target.classList.contains("copy-password-btn") || 
+        event.target.classList.contains("edit-password-btn") || 
+        event.target.classList.contains("delete-password-btn")) {
+      return;
+    }
+
+    // Handle card selection logic here (e.g., highlight the selected card)
+    $(this).addClass("selected").siblings().removeClass("selected"); // Assuming you want visual selection
+  });
+
   // Edit Button Click Event
   $(".edit-password-btn").on("click", function() {
     const passwordId = $(this).closest(".account-card").data("passwordId");
 
-    // Open an edit form modal 
+    // Open an edit form modal (assuming you have the structure defined)
     $("#editPasswordModal").modal("show");
 
-
+    // Assuming your modal has fields for editing website name, username, and password
     $.ajax({
       url: `/passwords/${passwordId}`,
       method: "GET",
       success: function(data) {
         $("#editAppName").val(data.title);
         $("#editUsername").val(data.username);
-        $("#editPassword").val(""); // Clear password field 
+        $("#editPassword").val(""); // Clear password field (optional)
       },
       error: function(error) {
         console.error("Error retrieving password details:", error);
-        // Handle errors 
+        // Handle errors (e.g., display an error message to the user)
       }
     });
   });
 
-  // Edit Form Submission 
+  // Edit Form Submission
   $("#editForm").submit(function(event) {
     event.preventDefault(); // Prevent default form submission
 
-    const passwordId = $("#editPasswordId").val(); 
+    const passwordId = $("#editPasswordId").val(); // Assuming a hidden field stores the password ID
     const appName = $("#editAppName").val();
     const username = $("#editUsername").val();
     const password = $("#editPassword").val(); // User-provided new password
 
-    // Hash the password before sending 
+    // Hash the password before sending (using bcrypt.js)
     bcrypt.genSalt(10, (err, salt) => {
       bcrypt.hash(password, salt, (err, hash) => {
         const editedData = {
@@ -51,14 +65,15 @@ $(document).ready(function() {
           contentType: "application/json; charset=utf-8",
           success: function(data) {
             console.log("Password updated successfully!");
-            // Update the account card details 
+            // Update the account card details (assuming you have a function to do this)
             updateAccountCard(passwordId, data);
             $("#editPasswordModal").modal("hide"); // Close the edit modal
           },
           error: function(error) {
             console.error("Error updating password:", error);
-            // Handle errors
-        }
+            // Handle errors (e.g., display an error message to the user)
+          }
+        });
       });
     });
   });
@@ -70,7 +85,7 @@ $(document).ready(function() {
     $("#deleteConfirmationModal").modal("show"); // Show the confirmation modal
   });
 
-  // Confirmation Modal - Delete Button Click 
+  // Confirmation Modal - Delete Button Click
   $(".confirm-delete-btn").on("click", function() {
     const passwordId = $(this).data("passwordId");
 
@@ -84,68 +99,69 @@ $(document).ready(function() {
       },
       error: function(error) {
         console.error("Error deleting password:", error);
-        // Handle errors 
+        // Handle errors (e.g., display an error message to the user)
       }
     });
   });
-});
 
+  async function fetchPasswordData() {
+    try {
+      const response = await $.ajax({
+        url: "/passwords",
+        method: "GET",
+      });
+      const passwordData = response.data; // Assuming your API response contains an array of password data
 
+      // Loop through password data and create account cards
+      populateAccountList(passwordData); // Use the separate populateAccountList function
 
-function populateAccountList(data) {
-  const accountList = $(".account-card");
-  accountList.empty(); // Clear existing content 
-
-  data.forEach(function(account) {
-    const appName = account.title; 
-    const username = account.username;
-
-    const accountElement = createAccountElement(appName, username);
-    accountList.parent().append(accountElement);
-  });
-}
-
-function createAccountElement(appName, username) {
-  // create the account card element
-  // creating the card element with modifications below
-
-  const passwordField = $('<input type="password" class="form-control password-field" disabled>');
-  const showPasswordBtn = $('<button type="button" class="btn btn-secondary btn-sm show-password-btn">Show Password</button>');
-  const copyPasswordBtn = $('<button type="button" class="btn btn-secondary btn-sm copy-password-btn" disabled>Copy</button>');
-
-  // Append these elements to  existing account card structure
-  // append passwordField, showPasswordBtn, copyPasswordBtn
-
-  return accountElement; // Assuming you return the modified card element
-}
-
-function togglePasswordVisibility(passwordField, showPasswordBtn, copyPasswordBtn) {
-  const isVisible = passwordField.attr("type") === "text";
-
-  if (isVisible) {
-    passwordField.attr("type", "password");
-    showPasswordBtn.find("i").removeClass("fa-eye-slash").addClass("fa-eye"); // Update icon class
-    copyPasswordBtn.disabled = true;
-  } else {
-    passwordField.attr("type", "text");
-    showPasswordBtn.find("i").removeClass("fa-eye").addClass("fa-eye-slash"); // Update icon class
-    copyPasswordBtn.disabled = false;
+    } catch (error) {
+      console.error("Error fetching password data:", error);
+      // Handle errors (e.g., display an error message to the user)
+    }
   }
-}
 
+  // Function to populate account list with password data
+  function populateAccountList(data) {
+    const accountList = $(".account-card"); // Assuming you have an element to hold account cards
+    accountList.empty(); // Clear existing content
 
-// Remember to include and configure the clipboard.js library for secure clipboard access
+    data.forEach(function(account) {
+      const appName = account.title;
+      const username = account.username;
 
-$(document).ready(function() {
-  // ... rest of the code ...
+      const accountElement = createAccountElement(appName, username);
+      accountList.parent().append(accountElement);
+    });
+  }
 
-  $(document).ready(function() {
-    // Add event listener for copy button click
-    $(".copy-password-btn").on("click", function() {
-      const passwordField = $(this).closest(".account-card").find(".password-field");
+  // Function to create a single account card element
+  function createAccountElement(appName, username) {
+    const cardTemplate = `
+      <div class="card account-card" data-password-id="<span class="math-inline">\{Math\.random\(\)\.toString\(36\)\.substring\(2, 15\)\}"\>
+<div class\="card\-body"\>
+<h5 class\="card\-title"\></span>{appName}</h5>
+          <p class="card-text">Username: ${username}</p>
+          <input type="password" class="form-control password-field" disabled>
+          <button type="button" class="btn btn-secondary btn-sm show-password-btn">Show Password</button>
+          <button type="button" class="btn btn-secondary btn-sm copy-password-btn" disabled>Copy</button>
+          <button type="button" class="btn btn-info btn-sm edit-password-btn">Edit</button>
+          <button type="button" class="btn btn-danger btn-sm delete-password-btn">Delete</button>
+        </div>
+      </div>
+    `;
+
+    // Include password visibility/copy functionality within the card element
+    const passwordField = $(cardTemplate).find(".password-field");
+    const showPasswordBtn = $(cardTemplate).find(".show-password-btn");
+    const copyPasswordBtn = $(cardTemplate).find(".copy-password-btn");
+
+    showPasswordBtn.on("click", function() {
+      togglePasswordVisibility(passwordField, showPasswordBtn, copyPasswordBtn);
+    });
+
+    copyPasswordBtn.on("click", function() {
       const password = passwordField.val();
-
-      // Use clipboard.js for secure clipboard access
       navigator.clipboard.writeText(password)
         .then(() => {
           console.log("Password copied to clipboard");
@@ -155,28 +171,44 @@ $(document).ready(function() {
           // Handle potential errors (e.g., clipboard permissions)
         });
     });
-  });
-});
-$(".edit-password-btn").on("click", function() {
-  // Handle edit functionality (e.g., open an edit form)
-  const passwordId = $(this).closest(".account-card").data("passwordId");
-  console.log("Edit button clicked for password ID:", passwordId);
-  // Implement your logic to open an edit form or modal window pre-populated with existing data
-});
 
-// Add click event listener for the delete confirmation button
-$(".confirm-delete-btn").on("click", function() {
-  const passwordId = $(this).data("passwordId");
-  console.log("Confirmed deletion for password ID:", passwordId);
-  // Implement your logic to delete the password entry from the backend
-  // This might involve sending a DELETE request to your API endpoint
-  $(this).closest(".modal").modal("hide"); // Hide the confirmation modal
-});
+    return $(cardTemplate); // Return the jQuery element for the account card
+  }
 
-// Logic to trigger the confirmation modal when clicking the delete button on an account card
-// (assuming you have a delete button implemented)
-$(".delete-password-btn").on("click", function() {
-  const passwordId = $(this).closest(".account-card").data("passwordId");
-  $(".confirm-delete-btn").data("passwordId", passwordId); // Set password ID for confirmation button
-  $("#deleteConfirmationModal").modal("show"); // Show the confirmation modal
-});
+  // Function to toggle password visibility and copy functionality
+  function togglePasswordVisibility(passwordField, showPasswordBtn, copyPasswordBtn) {
+    const isVisible = passwordField.attr("type") === "text";
+
+    if (isVisible) {
+      passwordField.attr("type", "password");
+      showPasswordBtn.find("i").removeClass("fa-eye-slash").addClass("fa-eye"); // Update icon class (assuming Font Awesome)
+      copyPasswordBtn.disabled = true;
+    } else {
+      passwordField.attr("type", "text");
+      showPasswordBtn.find("i").removeClass("fa-eye").addClass("fa-eye-slash"); // Update icon class
+      copyPasswordBtn.disabled = false;
+    }
+  }
+
+// Function to update account card details after edits (assuming you have logic to update data)
+function updateAccountCard(passwordId, updatedData) {
+  // Find the account card element with the matching ID
+  const accountCard = $(`.account-card[data-password-id="${passwordId}"]`);
+
+  // Update the card content with new data (e.g., title, username)
+  accountCard.find(".card-title").text(updatedData.title);
+  accountCard.find(".card-text p:first-child").text(`Username: ${updatedData.username}`);
+
+  // Optionally, update the password field content (if displayed differently after edit)
+  // ... (your logic here)
+
+  // Consider visual feedback (optional)
+  accountCard.addClass("updated").delay(1000).removeClass("updated"); // Briefly highlight the updated card
+}
+
+function displayErrorMessage(message) {
+  $("#errorMessageModal").find(".modal-body").text(message);
+  $("#errorMessageModal").modal("show");
+}
+})
+// Example usage in fetchPasswordData function
