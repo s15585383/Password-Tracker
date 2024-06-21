@@ -1,5 +1,5 @@
 const express = require('express');
-const { User, Password } = require('./models/user.js');
+const { User, Password } = require('./models/user');
 const loginRouter = require('./controllers/login'); 
 const cors = require('cors'); //for allowing cross-origin requests
 const jwt = require('jsonwebtoken');
