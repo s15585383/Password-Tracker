@@ -1,7 +1,7 @@
 const express = require('express');
 const { User, Password } = require('./models/user');
 const loginRouter = require('./controllers/login'); 
-const cors = require('cors'); //for allowing cross-origin requests
+// const cors = require('cors'); //for allowing cross-origin requests
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs'); // Include bcrypt for password hashing
 const app = express();
@@ -11,7 +11,7 @@ app.use(express.static('public'));
 app.use(express.static('controllers')); 
 
 // Enable CORS if needed for cross-origin requests (adjust origins as needed)
-app.use(cors({ origin: 'http://localhost:3001' })); 
+// app.use(cors({ origin: 'http://localhost:3001' })); 
 
 // Parse incoming JSON data
 app.use(express.json());
@@ -102,11 +102,16 @@ app.listen(port, () => {
 // Protected routes 
 app.get('/passwords', authorizeUser, async (req, res) => {
   try {
+    console.log("")
+
     const userId = req.user.id;
 
     const passwords = await Password.findAll({ where: { userId } });
 
+
     res.json(passwords);
+
+
   } catch (error) {
     console.error(error);
     res.status(500).send("Internal Server Error");
@@ -245,9 +250,9 @@ app.delete('/passwords/:id', verifyJwtToken, async (req, res) => {
 
 // ... other routes 
 //
-app.listen(port, () => {
-  console.log(`Server listening on port ${port}`);
-});
+// app.listen(port, () => {
+//   console.log(`Server listening on port ${port}`);
+// });
 
 async function getPasswordsByUserId(userId) {
   try {

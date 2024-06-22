@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router(); // Use a separate router for login
 const bcrypt = require('bcryptjs'); // For password hashing
-const User = require('./models/user.js'); 
+const User = require('../models/user'); 
 const jwt = require('jsonwebtoken'); // For JWT generation
 
 // ... other imports and setup (if needed)

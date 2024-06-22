@@ -4,6 +4,9 @@ const dotenv = require('dotenv');
 
 dotenv.config(); // Load environment variables
 
+console.log("in user: " + process.env.DB_HOST)
+// console.log("making db connection with config")
+
 // Sequelize Connection Details
 const sequelize = new Sequelize({
   dialect: 'postgres', 
