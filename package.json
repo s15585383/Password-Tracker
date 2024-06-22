@@ -1,7 +1,7 @@
 {
   "name": "password-tracker",
   "version": "1.0.0",
-  "main": "index.js",
+  "main": "user.js",
   "scripts": {
     "devStart": "nodemon app.js"
   },
