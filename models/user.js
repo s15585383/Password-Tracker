@@ -1,11 +1,12 @@
 const Sequelize = require('sequelize');
 const bcrypt = require('bcryptjs');
 const dotenv = require('dotenv');
+const create_users_and_passwords = require('./migrations/create_users_and_passwords')
 
 dotenv.config(); // Load environment variables
 
 console.log("in user: " + process.env.DB_HOST)
-// console.log("making db connection with config")
+console.log("making db connection with config")
 
 // Sequelize Connection Details
 const sequelize = new Sequelize({
@@ -14,9 +15,10 @@ const sequelize = new Sequelize({
   username: process.env.DB_USER,
   password: process.env.DB_PASSWORD,
   database: process.env.DB_NAME
+
 });
 
-// User Model Definition
+// User Model Definition (user info for accessing their account)
 const User = sequelize.define('User', {
   id: {
     type: Sequelize.INTEGER,
@@ -38,7 +40,7 @@ const User = sequelize.define('User', {
   },
 });
 
-//password model
+//password model (User inputs in application functionality)
 const Password = sequelize.define('Password', {
   title: {
     type: Sequelize.STRING,
@@ -90,7 +92,7 @@ async function registerUser(userInput) {
   const user = await User.create({
     username: userInput.username,
     passwordHash: hashedPassword,
-    email: userInput.email, // Include email here
+    email: userInput.email, 
   });
   console.log('User registered successfully:', user);
   return user;

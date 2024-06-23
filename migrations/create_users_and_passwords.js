@@ -5,6 +5,7 @@ module.exports = async (sequelize) => {
     CREATE TABLE users (
       id SERIAL PRIMARY KEY,
       username VARCHAR(255) UNIQUE, -- Assuming username is unique
+      email VARCHAR(255) UNIQUE, -- Add email with UNIQUE constraint
       passwordHash VARCHAR(255) NOT NULL
     );
   `);
@@ -20,3 +21,4 @@ module.exports = async (sequelize) => {
     );
   `);
 };
+

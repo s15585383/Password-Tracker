@@ -68,7 +68,7 @@ const authorizeUser = async (req, res, next) => {
     res.status(500).send("Internal Server Error");
   }
 };
-
+// REGISTER SERVER SIDE
 app.post('/register', async (req, res) => {
   try {
     const { username, password } = req.body;
@@ -89,7 +89,7 @@ app.post('/register', async (req, res) => {
   }
 });
 
-// Serve the login page 
+// LOGIN SERVER SIDE
 app.get('/login', (req, res) => {
   res.sendFile('login.html', { root: 'public' }); 
 });
