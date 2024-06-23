@@ -3,20 +3,6 @@ const bcrypt = require('bcryptjs');
 const dotenv = require('dotenv');
 const create_users_and_passwords = require('./migrations/create_users_and_passwords')
 
-dotenv.config(); // Load environment variables
-
-console.log("in user: " + process.env.DB_HOST)
-console.log("making db connection with config")
-
-// Sequelize Connection Details
-const sequelize = new Sequelize({
-  dialect: 'postgres', 
-  host: process.env.DB_HOST,
-  username: process.env.DB_USER,
-  password: process.env.DB_PASSWORD,
-  database: process.env.DB_NAME
-
-});
 
 // User Model Definition (user info for accessing their account)
 const User = sequelize.define('User', {
@@ -37,28 +23,6 @@ const User = sequelize.define('User', {
       type: Sequelize.STRING,
       allowNull: false, // Make email mandatory
       unique: true, // Ensure unique email addresses
-  },
-});
-
-//password model (User inputs in application functionality)
-const Password = sequelize.define('Password', {
-  title: {
-    type: Sequelize.STRING,
-    allowNull: false,
-  },
-  username: {
-    type: Sequelize.STRING,
-  }, //  duplicate for display purposes
-  password: {
-    type: Sequelize.STRING,
-    allowNull: false,
-  }, // Store hashed password
-  userId: {
-    type: Sequelize.INTEGER,
-    references: {
-      model: User,
-      key: 'id',
-    },
   },
 });
 
@@ -119,33 +83,6 @@ async function loginUser(userInput) {
   return { success: true, user: user }; // Return user object or relevant information
 }
 
-// Edit Password Functionality
-async function editPassword(passwordId, editedData) {
-  // Assuming editedData contains title, username, and password (hashed)
-  try {
-    const password = await Password.findByPk(passwordId);
 
-    if (!password) {
-      throw new Error('Password not found'); // Handle non-existent password
-    }
-
-    await password.update(editedData);
-    console.log('Password updated successfully:', password);
-  } catch (error) {
-    console.error('Error editing password:', error);
-    // Handle errors (e.g., display an error message to the user)
-  }
-}
-
-// Test connection
-(async () => {
-  try {
-    await sequelize.authenticate();
-    console.log('Connection to database established successfully.');
-  } catch (error) {
-    console.error('Error connecting to database:', error);
-    process.exit(1); // Exit process on connection failure
-  }
-})();
 
 module.exports = { User, Password, sequelize }; // Export the User model, password and Sequelize instance
