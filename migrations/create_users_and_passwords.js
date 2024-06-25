@@ -1,4 +1,4 @@
-const { Sequelize } = require('sequelize');
+const { Sequelize } = require("sequelize");
 
 module.exports = async (sequelize) => {
   await sequelize.query(`
@@ -17,8 +17,7 @@ module.exports = async (sequelize) => {
       title VARCHAR(255) NOT NULL,
       url VARCHAR(255),
       username VARCHAR(255),
-      passwordHash VARCHAR(255) NOT NULL
+      password VARCHAR(255) NOT NULL
     );
   `);
 };
-
