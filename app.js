@@ -1,34 +1,34 @@
-const express = require('express');
-const { User, Password } = require('./models/user');
-const loginRouter = require('./controllers/login'); 
+const express = require("express");
+const { User, Password } = require("./models/User");
+const loginRouter = require("./controllers/login");
 // const cors = require('cors'); //for allowing cross-origin requests
-const jwt = require('jsonwebtoken');
-const bcrypt = require('bcryptjs'); // Include bcrypt for password hashing
+const jwt = require("jsonwebtoken");
+const bcrypt = require("bcrypt"); // Include bcrypt for password hashing
 const app = express();
 const port = process.env.PORT || 3000; // Use environment variable for port
 
-app.use(express.static('public')); 
-app.use(express.static('controllers')); 
+app.use(express.static("public"));
+app.use(express.static("controllers"));
 
 // Enable CORS if needed for cross-origin requests (adjust origins as needed)
-// app.use(cors({ origin: 'http://localhost:3001' })); 
+// app.use(cors({ origin: 'http://localhost:3001' }));
 
 // Parse incoming JSON data
 app.use(express.json());
 
 // Login route using the imported login controller
-app.use('/auth', loginRouter);
+app.use("/auth", loginRouter);
 
 // Function to verify JWT token
 function verifyJwtToken(req, res, next) {
   const authHeader = req.headers.authorization;
 
   // Check if authorization header is present and formatted correctly
-  if (!authHeader || !authHeader.startsWith('Bearer ')) {
+  if (!authHeader || !authHeader.startsWith("Bearer ")) {
     return res.status(401).send("Unauthorized: Access denied");
   }
 
-  const token = authHeader.split(' ')[1]; // Extract token from header
+  const token = authHeader.split(" ")[1]; // Extract token from header
 
   // Verify the token using jsonwebtoken.verify
   jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
@@ -36,7 +36,7 @@ function verifyJwtToken(req, res, next) {
       return res.status(401).send("Unauthorized: Invalid token");
     }
 
-    // Token is valid, attach decoded user data to the request object 
+    // Token is valid, attach decoded user data to the request object
     req.user = decoded;
     next(); // Proceed with the request if token is valid
   });
@@ -44,18 +44,19 @@ function verifyJwtToken(req, res, next) {
 
 // User registration route
 
-
 const authorizeUser = async (req, res, next) => {
   try {
     const passwordId = req.params.id; // Extract password ID from request params
-    const userId = req.user.id; 
+    const userId = req.user.id;
 
     // Check if password entry exists and belongs to the logged-in user
     const password = await Password.findByPk(passwordId, {
-      include: [{
-        model: User,
-        where: { id: userId }, // Filter by logged-in user
-      }],
+      include: [
+        {
+          model: User,
+          where: { id: userId }, // Filter by logged-in user
+        },
+      ],
     });
 
     if (!password) {
@@ -69,7 +70,7 @@ const authorizeUser = async (req, res, next) => {
   }
 };
 // REGISTER SERVER SIDE
-app.post('/register', async (req, res) => {
+app.post("/register", async (req, res) => {
   try {
     const { username, password } = req.body;
 
@@ -82,7 +83,6 @@ app.post('/register', async (req, res) => {
     //generate JWT token on signup
 
     res.status(201).json({ message: "User created successfully" });
-
   } catch (error) {
     console.error(error);
     res.status(500).send("Internal Server Error");
@@ -90,34 +90,26 @@ app.post('/register', async (req, res) => {
 });
 
 // LOGIN SERVER SIDE
-app.get('/login', (req, res) => {
-  res.sendFile('login.html', { root: 'public' }); 
+app.get("/login", (req, res) => {
+  res.sendFile("login.html", { root: "public" });
 });
 
-
-app.listen(port, () => {
-  console.log(`Server listening on port ${port}`);
-});
-
-// Protected routes 
-app.get('/passwords', authorizeUser, async (req, res) => {
+// Protected routes
+app.get("/passwords", authorizeUser, async (req, res) => {
   try {
-    console.log("")
+    console.log("");
 
     const userId = req.user.id;
 
     const passwords = await Password.findAll({ where: { userId } });
 
-
     res.json(passwords);
-
-
   } catch (error) {
     console.error(error);
     res.status(500).send("Internal Server Error");
   }
 });
-app.get('/passwords/:id', authorizeUser, async (req, res) => {
+app.get("/passwords/:id", authorizeUser, async (req, res) => {
   try {
     const passwordId = req.params.id;
 
@@ -134,20 +126,19 @@ app.get('/passwords/:id', authorizeUser, async (req, res) => {
   }
 });
 
-
-app.post('/register', async (req, res) => {
+app.post("/register", async (req, res) => {
   const { username, masterPassword } = req.body;
   try {
     const newUser = await User.create({ username, masterPassword }); // Hash password before storing
-    res.json({ message: 'User created successfully!', user: newUser });
+    res.json({ message: "User created successfully!", user: newUser });
   } catch (error) {
-    console.error('Error creating user:', error);
-    res.status(500).json({ message: 'Error creating user' });
+    console.error("Error creating user:", error);
+    res.status(500).json({ message: "Error creating user" });
   }
 });
 
 // Login route handler
-app.post('/login', async (req, res) => {
+app.post("/login", async (req, res) => {
   try {
     const { username, password } = req.body;
 
@@ -156,11 +147,15 @@ app.post('/login', async (req, res) => {
 
     // Check if user exists and validate password
     if (!user || !(await bcrypt.compare(password, user.passwordHash))) {
-      return res.status(401).json({ message: "Login failed: Incorrect username or password" });
+      return res
+        .status(401)
+        .json({ message: "Login failed: Incorrect username or password" });
     }
 
     // Generate JWT token on successful login
-    const token = jwt.sign({ userId: user.id }, process.env.JWT_SECRET, { expiresIn: '30m' }); // Adjust expiration time as needed
+    const token = jwt.sign({ userId: user.id }, process.env.JWT_SECRET, {
+      expiresIn: "30m",
+    }); // Adjust expiration time as needed
 
     res.json({ message: "Login successful", token });
   } catch (error) {
@@ -169,27 +164,32 @@ app.post('/login', async (req, res) => {
   }
 });
 
-
 // Protected route for creating a password (POST)
-app.post('/passwords', async (req, res) => {
+app.post("/passwords", async (req, res) => {
   try {
     const { title, username, password } = req.body;
     const userId = req.user.id; // Assuming user ID is stored in req.user
 
     const hashedPassword = await bcrypt.hash(password, 10); // Hash the password
 
-    const newPassword = await Password.create({ title, username, password: hashedPassword, userId });
+    const newPassword = await Password.create({
+      title,
+      username,
+      password: hashedPassword,
+      userId,
+    });
 
-    res.status(201).json({ message: "Password created successfully", newPassword });
+    res
+      .status(201)
+      .json({ message: "Password created successfully", newPassword });
   } catch (error) {
     console.error(error);
     res.status(500).send("Internal Server Error");
   }
 });
 
-
 // Protected route for updating a password (PUT)
-app.put('/passwords/:id', authorizeUser, async (req, res) => {
+app.put("/passwords/:id", authorizeUser, async (req, res) => {
   try {
     const passwordId = req.params.id;
     const { title, username, password } = req.body;
@@ -217,9 +217,8 @@ app.put('/passwords/:id', authorizeUser, async (req, res) => {
   }
 });
 
-
 // Protected route for deleting a password (DELETE)
-app.delete('/passwords/:id', verifyJwtToken, async (req, res) => {
+app.delete("/passwords/:id", verifyJwtToken, async (req, res) => {
   try {
     // Extract password ID from route parameter
     const passwordId = req.params.id;
@@ -234,7 +233,9 @@ app.delete('/passwords/:id', verifyJwtToken, async (req, res) => {
 
     // Verify user authorization (password belongs to the user)
     if (password.userId !== req.user.id) {
-      return res.status(401).send("Unauthorized: You cannot delete this password");
+      return res
+        .status(401)
+        .send("Unauthorized: You cannot delete this password");
     }
 
     // Delete the password entry
@@ -248,7 +249,7 @@ app.delete('/passwords/:id', verifyJwtToken, async (req, res) => {
   }
 });
 
-// ... other routes 
+// ... other routes
 //
 // app.listen(port, () => {
 //   console.log(`Server listening on port ${port}`);
@@ -265,4 +266,8 @@ async function getPasswordsByUserId(userId) {
     console.error(error);
     throw error; // Re-throw the error for handling in the route
   }
-};
+}
+
+app.listen(port, () => {
+  console.log(`Server listening on port ${port}`);
+});
