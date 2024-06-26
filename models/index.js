@@ -1,4 +1,4 @@
-const User = require("./User"); // Import the User model definition
+const User = require("./Users"); // Import the User model definition
 const Password = require("./Password"); // Import the Passwords model definition
 
 /**
