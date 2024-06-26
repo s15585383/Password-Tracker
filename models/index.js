@@ -1,5 +1,5 @@
 const User = require("./User"); // Import the User model definition
-const Passwords = require("./Passwords"); // Import the Passwords model definition
+const Passwords = require("./Password"); // Import the Passwords model definition
 
 /**
  * Define a one-to-many relationship between User and Passwords models using Sequelize associations.
