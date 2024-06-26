@@ -1,13 +1,25 @@
-const { Model, DataTypes } = require("sequelize");
-const bcrypt = require("bcrypt");
-const sequelize = require("../config/connection");
+const { Model, DataTypes } = require("sequelize"); // Import Sequelize components
+const bcrypt = require("bcrypt"); // Import bcrypt for password hashing
+const sequelize = require("../config/connection"); // Import the Sequelize instance
 
+/**
+ * Define the Passwords model using Sequelize. This model represents password entries
+ * for users in the database.
+ */
 class Passwords extends Model {
+  /**
+   * This method checks if the provided password (loginPw) matches the hashed password
+   * stored in the model instance.
+   *
+   * @param {string} loginPw The plain text password to compare.
+   * @returns {boolean} True if passwords match, false otherwise.
+   */
   checkPassword(loginPw) {
     return bcrypt.compareSync(loginPw, this.password);
   }
 }
 
+// Define the schema and configuration for the Passwords model
 Passwords.init(
   {
     id: {
@@ -23,11 +35,12 @@ Passwords.init(
     username: {
       type: DataTypes.STRING,
       allowNull: false,
-    }, //  duplicate for display purposes
+    },
+    // Store the hashed password, not the plain text password
     password: {
       type: DataTypes.STRING,
       allowNull: false,
-    }, // Store hashed password
+    },
     userId: {
       type: DataTypes.INTEGER,
       references: {
@@ -39,6 +52,10 @@ Passwords.init(
   {
     hooks: {
       beforeCreate: async (newPasswordData) => {
+        /**
+         * Hash the password before creating a new password entry.
+         * This ensures only the hashed password is stored in the database.
+         */
         newPasswordData.password = await bcrypt.hash(
           newPasswordData.password,
           10
@@ -46,11 +63,15 @@ Passwords.init(
         return newPasswordData;
       },
       beforeUpdate: async (updatedPasswordData) => {
-        updatedUserData.password = await bcrypt.hash(
+        /**
+         * Hash the password before updating an existing password entry.
+         * This ensures the updated password is also stored in a hashed form.
+         */
+        updatedPasswordData.password = await bcrypt.hash(
           updatedPasswordData.password,
           10
         );
-        return updatedUserData;
+        return updatedPasswordData;
       },
     },
     sequelize,

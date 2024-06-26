@@ -1,13 +1,25 @@
-const { Model, DataTypes } = require("sequelize");
-const bcrypt = require("bcrypt");
-const sequelize = require("../config/connection");
+const { Model, DataTypes } = require("sequelize"); // Import Sequelize components
+const bcrypt = require("bcrypt"); // Import bcrypt for password hashing
+const sequelize = require("../config/connection"); // Import the Sequelize instance
 
+/**
+ * Define the User model using Sequelize. This model represents user accounts
+ * in the database.
+ */
 class User extends Model {
+  /**
+   * This method checks if the provided password (loginPw) matches the hashed password
+   * stored in the model instance.
+   *
+   * @param {string} loginPw The plain text password to compare.
+   * @returns {boolean} True if passwords match, false otherwise.
+   */
   checkPassword(loginPw) {
     return bcrypt.compareSync(loginPw, this.password);
   }
 }
 
+// Define the schema and configuration for the User model
 User.init(
   {
     id: {
@@ -23,26 +35,34 @@ User.init(
     email: {
       type: DataTypes.STRING,
       allowNull: false,
-      unique: true,
+      unique: true, // Enforces no duplicate emails
       validate: {
-        isEmail: true,
+        isEmail: true, // Ensures a valid email format
       },
     },
     password: {
       type: DataTypes.STRING,
       allowNull: false,
       validate: {
-        len: [8],
+        len: [8], // Minimum password length of 8 characters
       },
     },
   },
   {
     hooks: {
       beforeCreate: async (newUserData) => {
+        /**
+         * Hash the password before creating a new user.
+         * This ensures only the hashed password is stored in the database.
+         */
         newUserData.password = await bcrypt.hash(newUserData.password, 10);
         return newUserData;
       },
       beforeUpdate: async (updatedUserData) => {
+        /**
+         * Hash the password before updating an existing user.
+         * This ensures the updated password is also stored in a hashed form.
+         */
         updatedUserData.password = await bcrypt.hash(
           updatedUserData.password,
           10
@@ -59,59 +79,3 @@ User.init(
 );
 
 module.exports = User;
-
-// Hook to hash password before saving (if creating a new user)
-// User.beforeCreate(async (user) => {
-//   if (user.masterPassword) { // Not recommended for user input anymore
-//     console.warn('masterPassword field is not recommended for user input. Use separate hashing logic.');
-//   }
-//   // Check if user provides a password before hashing
-//   if (user.password) {
-//     const salt = await bcrypt.genSalt(10);
-//     user.passwordHash = await bcrypt.hash(user.password, salt);
-//     delete user.password; // Remove plain text password after hashing
-//   }
-// });
-
-// // Separate User Input Object Example (for Registration or Login)
-// const userInput = {
-//   username: '', // User-provided username
-//   password: '', // User-provided password (plain text)
-//   email: '',  // User-provided email address
-// };
-
-// // Registration Example (using separate user input)
-// async function registerUser(userInput) {
-//   const hashedPassword = await bcrypt.hash(userInput.password, 10);
-
-//   // Create a User instance with email and hashed password
-//   const user = await User.create({
-//     username: userInput.username,
-//     passwordHash: hashedPassword,
-//     email: userInput.email,
-//   });
-//   console.log('User registered successfully:', user);
-//   return user;
-// }
-
-// // Login Example (Optional)
-// async function loginUser(userInput) {
-//   const user = await User.findOne({ where: { username: userInput.username } });
-
-//   if (!user) {
-//     // Handle invalid username case (e.g., return error message)
-//     return { success: false, message: 'Invalid username or password' };
-//   }
-
-//   const passwordMatch = await bcrypt.compare(userInput.password, user.passwordHash);
-
-//   if (!passwordMatch) {
-//     // Handle invalid password case (e.g., return error message)
-//     return { success: false, message: 'Invalid username or password' };
-//   }
-
-//   // Login successful (replace with your login logic)
-//   return { success: true, user: user }; // Return user object or relevant information
-// }
-
-// module.exports = User

@@ -1,60 +1,65 @@
-const express = require("express");
-const { User, Password } = require("./models/User");
-const loginRouter = require("./controllers/api/login");
-// const cors = require('cors'); //for allowing cross-origin requests
-const jwt = require("jsonwebtoken");
-const bcrypt = require("bcrypt"); // Include bcrypt for password hashing
-const app = express();
-const port = process.env.PORT || 3000; // Use environment variable for port
+const express = require("express"); // Import Express framework for building the server
+const { User, Password } = require("./models/User"); // Import User and Password models for database interaction
+const loginRouter = require("./controllers/api/login"); // Import login controller for handling login requests
+// const cors = require('cors'); // Import CORS middleware (commented out for now)
+const jwt = require("jsonwebtoken"); // Import JWT library for token generation and verification
+const bcrypt = require("bcrypt"); // Import bcrypt for password hashing
 
+// Create an Express application instance
+const app = express();
+
+// Define the port to listen on (use environment variable or default to 3000)
+const port = process.env.PORT || 3000;
+
+// Serve static files from the "public" directory
 app.use(express.static("public"));
+
+// Serve static files from the "controllers" directory (not typical usage, for illustration purposes)
 app.use(express.static("controllers"));
 
-// Enable CORS if needed for cross-origin requests (adjust origins as needed)
+// Enable CORS if needed for cross-origin requests (commented out for now, adjust origins as needed)
 // app.use(cors({ origin: 'http://localhost:3001' }));
 
-// Parse incoming JSON data
+// Parse incoming JSON data in request body
 app.use(express.json());
 
-// Login route using the imported login controller
+// Use the imported login controller for requests under the "/auth" path
 app.use("/auth", loginRouter);
 
-// Function to verify JWT token
+// Function to verify a JWT token included in the request authorization header
 function verifyJwtToken(req, res, next) {
+  // Check if the authorization header exists and has the correct format ("Bearer token")
   const authHeader = req.headers.authorization;
-
-  // Check if authorization header is present and formatted correctly
   if (!authHeader || !authHeader.startsWith("Bearer ")) {
     return res.status(401).send("Unauthorized: Access denied");
   }
 
-  const token = authHeader.split(" ")[1]; // Extract token from header
+  const token = authHeader.split(" ")[1]; // Extract the token string from the header
 
-  // Verify the token using jsonwebtoken.verify
+  // Verify the token using the JWT library and the secret key from the environment variable
   jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
     if (err) {
       return res.status(401).send("Unauthorized: Invalid token");
     }
 
-    // Token is valid, attach decoded user data to the request object
+    // If the token is valid, attach the decoded user data to the request object for access in routes
     req.user = decoded;
-    next(); // Proceed with the request if token is valid
+    next(); // Proceed with the request handler if the token is valid
   });
 }
 
-// User registration route
-
+// Function to authorize a user based on the password ID in the request parameter and the logged-in user's ID
 const authorizeUser = async (req, res, next) => {
   try {
-    const passwordId = req.params.id; // Extract password ID from request params
-    const userId = req.user.id;
+    const passwordId = req.params.id; // Extract the password ID from the request parameters
+    const userId = req.user.id; // Get the logged-in user's ID from the request object
 
-    // Check if password entry exists and belongs to the logged-in user
+    // Find the password entry with the specified ID and check if it belongs to the logged-in user
     const password = await Password.findByPk(passwordId, {
       include: [
         {
           model: User,
-          where: { id: userId }, // Filter by logged-in user
+          where: { id: userId }, // Filter by the logged-in user's ID
         },
       ],
     });
@@ -69,18 +74,22 @@ const authorizeUser = async (req, res, next) => {
     res.status(500).send("Internal Server Error");
   }
 };
-// REGISTER SERVER SIDE
+
+// **--- User Registration Route ---**
+// Handles user registration with username and password hashing
+
 app.post("/register", async (req, res) => {
   try {
-    const { username, password } = req.body;
+    const { username, password } = req.body; // Extract username and password from the request body
 
-    // Hash the password
+    // Hash the password using bcrypt for secure storage
     const hashedPassword = await bcrypt.hash(password, 10); // Adjust salt rounds as needed
 
-    // Create a new user
+    // Create a new user record in the database
     const user = await User.create({ username, passwordHash: hashedPassword });
 
-    //generate JWT token on signup
+    // Generate a JWT token upon successful registration (implementation detail)
+    // ... (code for JWT token generation omitted)
 
     res.status(201).json({ message: "User created successfully" });
   } catch (error) {
@@ -89,6 +98,8 @@ app.post("/register", async (req, res) => {
   }
 });
 
+// **--- User Login Route ---**
+// Handles user login with username and password verification
 // LOGIN SERVER SIDE
 app.get("/login", (req, res) => {
   res.sendFile("login.html", { root: "public" });
