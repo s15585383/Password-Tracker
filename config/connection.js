@@ -20,13 +20,12 @@ if (process.env.DB_URL) {
   );
 
   // Test the connection to the database (optional but recommended)
-  try {
-    await sequelize.authenticate();
-    console.log("Connection to database established successfully.");
-  } catch (error) {
-    console.error("Error connecting to database:", error);
-    process.exit(1); // Exit the process with an error code if connection fails
-  }
+
+  // sequelize.authenticate();
+  // (error) {
+  //   console.error("Error connecting to database:", error);
+  //   process.exit(1); // Exit the process with an error code if connection fails
+  // }
 }
 
 // Export the sequelize instance for use in other parts of the application

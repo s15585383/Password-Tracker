@@ -1,4 +1,4 @@
-const bcrypt = require("bcryptjs"); // For password hashing
+const bcrypt = require("bcrypt"); // For password hashing
 const User = require("../models/User"); // Import the User model
 const jwt = require("jsonwebtoken"); // For JWT generation
 const validator = require("validator"); // For basic validation

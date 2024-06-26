@@ -1,36 +1,14 @@
 const router = require("express").Router(); // Create an Express router
 
 // Import project and user models from the models directory
-const { Project, User } = require("../models");
+const { Passwords, User } = require("../models");
 
 // Import the withAuth middleware function from the utils directory
 const withAuth = require("../utils/auth");
 
 // Route to display all projects on homepage
 router.get("/", async (req, res) => {
-  try {
-    // Find all projects and include associated user data (name)
-    const projectData = await Project.findAll({
-      include: [
-        {
-          model: User,
-          attributes: ["name"],
-        },
-      ],
-    });
-
-    // Convert project data to plain objects for template rendering
-    const projects = projectData.map((project) => project.get({ plain: true }));
-
-    // Pass serialized project data and logged_in status to the homepage template
-    res.render("homepage", {
-      projects,
-      logged_in: req.session.logged_in,
-    });
-  } catch (err) {
-    // Handle errors by sending a JSON response with status code 500
-    res.status(500).json(err);
-  }
+  res.sendFile(path.join(__dirname, "public/index.html"));
 });
 
 // Route to display a specific project by its ID
