@@ -1,5 +1,5 @@
 const express = require("express"); // Import Express framework for building the server
-const { User, Password } = require("./models/User"); // Import User and Password models for database interaction
+const { User, Password } = require("./models"); // Import User and Password models for database interaction
 const loginRouter = require("./controllers/api/login"); // Import login controller for handling login requests
 // const cors = require('cors'); // Import CORS middleware (commented out for now)
 const jwt = require("jsonwebtoken"); // Import JWT library for token generation and verification

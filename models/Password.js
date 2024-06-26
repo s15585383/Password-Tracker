@@ -6,7 +6,7 @@ const sequelize = require("../config/connection"); // Import the Sequelize insta
  * Define the Passwords model using Sequelize. This model represents password entries
  * for users in the database.
  */
-class Passwords extends Model {
+class Password extends Model {
   /**
    * This method checks if the provided password (loginPw) matches the hashed password
    * stored in the model instance.
@@ -20,7 +20,7 @@ class Passwords extends Model {
 }
 
 // Define the schema and configuration for the Passwords model
-Passwords.init(
+Password.init(
   {
     id: {
       type: DataTypes.INTEGER,
@@ -82,4 +82,4 @@ Passwords.init(
   }
 );
 
-module.exports = Passwords;
+module.exports = Password;

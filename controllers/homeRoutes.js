@@ -1,7 +1,7 @@
 const router = require("express").Router(); // Create an Express router
 
 // Import project and user models from the models directory
-const { Passwords, User } = require("../models");
+const { Password, User } = require("../models");
 
 // Import the withAuth middleware function from the utils directory
 const withAuth = require("../utils/auth");
