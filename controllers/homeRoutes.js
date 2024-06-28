@@ -1,21 +1,21 @@
 const router = require("express").Router(); // Create an Express router
 
-// Import project and user models from the models directory
+// Import Password and user models from the models directory
 const { Password, User } = require("../models");
 
 // Import the withAuth middleware function from the utils directory
 const withAuth = require("../utils/auth");
 
-// Route to display all projects on homepage
+// Route to display all Password on homepage
 router.get("/", async (req, res) => {
   res.sendFile(path.join(__dirname, "public/index.html"));
 });
 
-// Route to display a specific project by its ID
-router.get("/project/:id", async (req, res) => {
+// Route to display a specific Password by its ID
+router.get("/Password/:id", async (req, res) => {
   try {
-    // Find project by ID and include associated user data (name)
-    const projectData = await Project.findByPk(req.params.id, {
+    // Find Password by ID and include associated user data (name)
+    const passwordData = await Password.findByPk(req.params.id, {
       include: [
         {
           model: User,
@@ -24,12 +24,12 @@ router.get("/project/:id", async (req, res) => {
       ],
     });
 
-    // Convert project data to a plain object for template rendering
-    const project = projectData.get({ plain: true });
+    // Convert Password data to a plain object for template rendering
+    const Password = passwordData.get({ plain: true });
 
-    // Pass serialized project data and logged_in status to the project template
-    res.render("project", {
-      ...project,
+    // Pass serialized Password data and logged_in status to the Password template
+    res.render("Password", {
+      ...Password,
       logged_in: req.session.logged_in,
     });
   } catch (err) {
@@ -45,7 +45,7 @@ router.get("/profile", withAuth, async (req, res) => {
     // Exclude the password attribute from the user data
     const userData = await User.findByPk(req.session.user_id, {
       attributes: { exclude: ["password"] },
-      include: [{ model: Project }],
+      include: [{ model: Password }],
     });
 
     // Convert user data to a plain object for template rendering
